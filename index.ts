@@ -11,6 +11,7 @@ import { PumpFunSDK } from "./src/pumpfun/pumpfun";
 import { connection } from "./config";
 import { Bundler_provider_wallet_keypair, token, PRIORITY_FEE, LP_wallet_keypair } from "./settings";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
+import { Big } from "st-bigintr";
 
 export const init = async () => {
   try {
@@ -59,13 +60,25 @@ export const test = () => {
       return;
     }
 
-    const solAmount = parseFloat(answer);
-    if (isNaN(solAmount) || solAmount <= 0) {
+    let solBig: InstanceType<typeof Big>;
+    try {
+      solBig = new Big(answer.trim());
+    } catch {
       console.log("\tInvalid amount!")
       await sleep(1500)
       test();
       return;
     }
+    if (solBig.lte(0)) {
+      console.log("\tInvalid amount!")
+      await sleep(1500)
+      test();
+      return;
+    }
+
+    const buyLamports = BigInt(
+      solBig.times("1000000000").round(0, Big.roundDown).toFixed(0)
+    );
 
     try {
       const provider = new AnchorProvider(connection, new NodeWallet(new Keypair()), { commitment: "confirmed" });
@@ -77,7 +90,7 @@ export const test = () => {
       const buyIxs = await sdk.getBuyInstructionsBySolAmount(
         buyer.publicKey,
         mintPubkey,
-        BigInt(Math.floor(solAmount * 10 ** 9)),
+        buyLamports,
         0
       );
 

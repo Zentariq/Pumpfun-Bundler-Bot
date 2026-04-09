@@ -13,7 +13,6 @@ package-lock.json
 .env.production
 
 # settings
-settings.ts
 id.json
 
 # Sensitive wallet files
