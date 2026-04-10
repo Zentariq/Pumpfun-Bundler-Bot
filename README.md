@@ -12,6 +12,8 @@ Interactive CLI for Pump.fun–related flows: token launch, buy/sell bundling, h
 1. Install dependencies:
 
    ```bash
+   git clone https://github.com/Zentariq/Pumpfun-Bundler-Bot.git
+   cd Pumpfun-Bundler-Bot
    npm install
    ```
 
